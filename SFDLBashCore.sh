@@ -2,7 +2,7 @@
 
 # SFDLBashCore - BASH Loader Core - No Bullshit Only Downloads (GrafSauger)
 
-g_download_destination="$PWD"		# set download destination path
+g_download_destination="$(xdg-user-dir DOWNLOAD 2>/dev/null || echo "$HOME/Downloads")"		# set download destination path
 g_path_to_sfdl_files="$PWD"			# set your sfdl files path
 g_aes_password="mlcboard.com" 		# set password to decrypt download infomation
 g_maxDownloadThreads=3 				# set the maximum amount of simultaneously running downloads
@@ -18,7 +18,7 @@ g_base_paths="."					# set ftp path(s) array to download from
 #   1 - no more sfdl files in g_path_to_sfdl_files found (empty array)
 # 666 - unable to decrypt sfdl using g_aes_password
 
-g_loader_version="1.0.0"			# script version
+g_loader_version="1.0.1"			# script version
 
 function clean_path {
     local path="$1"
@@ -117,7 +117,7 @@ EOF
 sfdl_files=()
 while IFS= read -r -d '' file; do
     sfdl_files+=("$file")
-done < <(find "$g_path_to_sfdl_files" -type f -name '*.sfdl' -print0)
+done < <(find "$g_path_to_sfdl_files" -maxdepth 1 -type f -name '*.sfdl' -print0)
 sorted_files=($(for file in "${sfdl_files[@]}"; do
                     stat -c '%Y %n' "$file"
                 done | sort -n | awk '{print $2}'))
